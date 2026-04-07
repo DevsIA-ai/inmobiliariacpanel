@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — LUMIÈRE Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #E8D5A3;
+  --gold-dark: #8B6914;
+  --black: #0A0A0A;
+  --dark: #111111;
+  --dark-2: #1A1A1A;
+  --dark-3: #242424;
+  --dark-4: #2e2e2e;
+  --gray: #6B6B6B;
+  --gray-light: #B0B0B0;
+  --white: #FAFAF8;
+  --success: #4CAF7D;
+  --error: #e05252;
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Jost', sans-serif;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; }
+body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); min-height: 100vh; display: flex; font-weight: 300; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--dark);
+  border-right: 1px solid var(--dark-3);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.3s;
+}
+.sidebar-logo {
+  padding: 1.4rem 1.5rem;
+  border-bottom: 1px solid var(--dark-3);
+  flex-shrink: 0;
+}
+.sidebar-logo h1 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+.sidebar-logo h1 span { color: var(--gold); }
+.sidebar-logo p { font-size: 0.55rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gray); margin-top: 0.25rem; }
+
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 0.75rem 0; }
+.nav-section-label {
+  font-size: 0.5rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gray);
+  padding: 0.8rem 1.5rem 0.4rem;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.5rem;
+  cursor: pointer;
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+  font-weight: 400;
+  user-select: none;
+}
+.nav-item:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+.nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.06); }
+.nav-item svg { flex-shrink: 0; opacity: 0.7; }
+.nav-item.active svg { opacity: 1; }
+
+.sidebar-footer {
+  border-top: 1px solid var(--dark-3);
+  padding: 0.75rem 0;
+}
+
+/* ── MAIN ── */
+.main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ── TOP BAR ── */
+.topbar {
+  height: var(--header-h);
+  background: var(--dark);
+  border-bottom: 1px solid var(--dark-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky; top: 0; z-index: 50;
+}
+.topbar-title { font-family: var(--font-display); font-size: 1.15rem; font-weight: 300; }
+.topbar-right { display: flex; align-items: center; gap: 1rem; }
+.topbar-user { font-size: 0.72rem; color: var(--gray-light); }
+.topbar-user span { color: var(--gold); font-weight: 500; }
+
+/* ── CONTENT ── */
+.content { padding: 2rem; flex: 1; }
+
+/* ── SECTION (panel) ── */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── CARDS DE STATS ── */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1rem; margin-bottom: 2rem; }
+.stat-box {
+  background: var(--dark-2);
+  border: 1px solid var(--dark-3);
+  padding: 1.4rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.stat-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+  opacity: 0.4;
+}
+.stat-num { font-family: var(--font-display); font-size: 2rem; color: var(--gold); line-height: 1; }
+.stat-lbl { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray-light); margin-top: 0.4rem; }
+
+/* ── SECTION HEADER ── */
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+.sec-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 300; }
+.sec-title span { font-style: italic; color: var(--gold-light); }
+
+/* ── BUTTONS ── */
+.btn { padding: 0.55rem 1.3rem; font-family: var(--font-body); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; border: none; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.4rem; }
+.btn-primary { background: var(--gold); color: var(--black); }
+.btn-primary:hover { background: var(--gold-light); }
+.btn-secondary { background: transparent; color: var(--white); border: 1px solid var(--dark-3); }
+.btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: transparent; color: var(--error); border: 1px solid rgba(224,82,82,0.3); }
+.btn-danger:hover { background: rgba(224,82,82,0.1); }
+.btn-sm { padding: 0.35rem 0.9rem; font-size: 0.62rem; }
+.btn-icon { padding: 0.5rem; background: var(--dark-3); color: var(--gray-light); border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+.btn-icon:hover { background: var(--dark-4); color: var(--white); }
+
+/* ── FORM ELEMENTS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.2rem; }
+.form-row.single { grid-template-columns: 1fr; }
+.form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-group label { font-size: 0.57rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+.form-group input, .form-group textarea, .form-group select {
+  background: var(--dark-3);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 300;
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--gold); }
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--gray); }
+.form-group textarea { resize: vertical; min-height: 90px; }
+.form-group select option { background: var(--dark-2); }
+
+/* ── CARD (box) ── */
+.box { background: var(--dark-2); border: 1px solid var(--dark-3); padding: 1.5rem; margin-bottom: 1.5rem; }
+.box-title { font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+.box-title::after { content: ''; flex: 1; height: 1px; background: var(--dark-3); }
+
+/* ── PROPERTY TABLE ── */
+.props-table { width: 100%; border-collapse: collapse; }
+.props-table th, .props-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--dark-3);
+  font-size: 0.78rem;
+}
+.props-table th { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 400; }
+.props-table tr:hover td { background: rgba(255,255,255,0.02); }
+.props-table td:last-child { display: flex; gap: 0.4rem; align-items: center; justify-content: flex-end; }
+.badge { padding: 0.18rem 0.6rem; font-size: 0.58rem; letter-spacing: 0.1em; font-weight: 500; }
+.badge-venta { background: rgba(201,168,76,0.12); color: var(--gold); }
+.badge-renta { background: rgba(76,175,125,0.12); color: var(--success); }
+.prop-thumb { width: 44px; height: 36px; object-fit: cover; }
+
+/* ── TESTIMONIALS ── */
+.testimonial-list { display: flex; flex-direction: column; gap: 1rem; }
+.testimonial-item { background: var(--dark-3); padding: 1.2rem; display: flex; gap: 1rem; align-items: flex-start; }
+.testi-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--gold); }
+.testi-body { flex: 1; }
+.testi-name { font-weight: 500; font-size: 0.83rem; color: var(--white); }
+.testi-role { font-size: 0.65rem; color: var(--gold); margin-top: 0.12rem; }
+.testi-text { font-size: 0.78rem; color: var(--gray-light); line-height: 1.7; margin-top: 0.5rem; font-style: italic; }
+.testi-actions { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+
+/* ── TEAM ── */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 1rem; }
+.team-item { background: var(--dark-3); padding: 1.2rem; text-align: center; position: relative; }
+.team-item img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; object-position: top; border: 2px solid var(--gold); margin-bottom: 0.7rem; }
+.team-item-name { font-family: var(--font-display); font-size: 1rem; }
+.team-item-role { font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-top: 0.2rem; }
+.team-item-actions { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.8rem; }
+
+/* ── IMAGE UPLOAD ── */
+.img-upload-zone {
+  border: 2px dashed var(--dark-3);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.img-upload-zone:hover, .img-upload-zone.drag-over { border-color: var(--gold); background: rgba(201,168,76,0.04); }
+.img-upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.img-upload-label { font-size: 0.72rem; color: var(--gray-light); }
+.img-upload-label span { color: var(--gold); }
+.img-preview { max-width: 100%; max-height: 180px; object-fit: contain; display: none; margin: 0 auto; }
+
+/* ── CONTACT FORM FIELDS ── */
+.contact-field { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--dark-3); }
+.contact-field-icon { color: var(--gold); flex-shrink: 0; }
+.contact-field-label { font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); width: 90px; flex-shrink: 0; }
+.contact-field input { flex: 1; background: var(--dark-3); border: 1px solid transparent; color: var(--white); font-family: var(--font-body); font-size: 0.85rem; font-weight: 300; padding: 0.5rem 0.8rem; outline: none; transition: border-color 0.2s; }
+.contact-field input:focus { border-color: var(--gold); }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed;
+  bottom: 2rem; right: 2rem;
+  background: var(--dark-2);
+  border: 1px solid var(--dark-3);
+  border-left: 3px solid var(--success);
+  padding: 0.9rem 1.4rem;
+  font-size: 0.78rem;
+  color: var(--white);
+  z-index: 9999;
+  transform: translateY(20px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+  min-width: 220px;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.error { border-left-color: var(--error); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--dark-2);
+  border: 1px solid var(--dark-3);
+  width: 100%;
+  max-width: 660px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+.modal-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.modal-header {
+  padding: 1.5rem 1.5rem 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-header h2 { font-family: var(--font-display); font-size: 1.2rem; font-weight: 300; }
+.modal-close { background: none; border: none; color: var(--gray); cursor: pointer; font-size: 1.1rem; padding: 0.2rem; }
+.modal-close:hover { color: var(--white); }
+.modal-body { padding: 1.5rem; }
+.modal-footer { padding: 0 1.5rem 1.5rem; display: flex; gap: 0.6rem; justify-content: flex-end; }
+
+/* ── TOGGLE ── */
+.toggle-wrap { display: flex; align-items: center; gap: 0.7rem; font-size: 0.75rem; color: var(--gray-light); }
+.toggle { position: relative; width: 36px; height: 20px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--dark-3);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  left: 3px; bottom: 3px;
+  background: var(--gray);
+  border-radius: 50%;
+  transition: transform 0.2s, background 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: rgba(201,168,76,0.2); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--gold); }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 3rem; color: var(--gray); }
+.empty-state p { font-family: var(--font-display); font-size: 1.2rem; margin-bottom: 0.5rem; }
+.empty-state span { font-size: 0.78rem; }
+
+/* ── TAGS INPUT ── */
+.tags-container { display: flex; flex-wrap: wrap; gap: 0.4rem; background: var(--dark-3); border: 1px solid rgba(255,255,255,0.07); padding: 0.5rem 0.7rem; min-height: 44px; align-items: center; transition: border-color 0.2s; }
+.tags-container:focus-within { border-color: var(--gold); }
+.tag { background: rgba(201,168,76,0.12); color: var(--gold); padding: 0.2rem 0.6rem; font-size: 0.72rem; display: flex; align-items: center; gap: 0.3rem; }
+.tag button { background: none; border: none; color: var(--gold); cursor: pointer; font-size: 0.8rem; padding: 0; line-height: 1; }
+.tags-input { background: transparent; border: none; outline: none; color: var(--white); font-family: var(--font-body); font-size: 0.85rem; font-weight: 300; flex: 1; min-width: 80px; padding: 0.2rem; }
+
+/* ── MOBILE ── */
+.sidebar-toggle { display: none; }
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main { margin-left: 0; }
+  .sidebar-toggle { display: flex; background: var(--dark-3); border: none; color: var(--white); cursor: pointer; padding: 0.5rem; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.triple { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--dark-4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray); }
+
+/* Section active tabs */
+.section-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--dark-3); }
+.section-tab { padding: 0.6rem 1.3rem; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; color: var(--gray); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-body); }
+.section-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.section-tab:hover:not(.active) { color: var(--white); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.divider-gold { height: 1px; background: linear-gradient(90deg, var(--gold), transparent); opacity: 0.3; margin: 1.5rem 0; }
+
+.color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h1>LUMIÈRE <span>·</span> ADMIN</h1>
+    <p>Panel de control</p>
+  </div>
+  <nav class="sidebar-nav">
+    <p class="nav-section-label">General</p>
+    <div class="nav-item active" data-panel="dashboard" onclick="switchPanel(this,'dashboard')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+
+    <p class="nav-section-label">Contenido</p>
+    <div class="nav-item" data-panel="inicio" onclick="switchPanel(this,'inicio')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+      Inicio
+    </div>
+    <div class="nav-item" data-panel="propiedades" onclick="switchPanel(this,'propiedades')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 22V8l11-5 11 5v14"/><path d="M9 22v-9h6v9"/></svg>
+      Propiedades
+    </div>
+    <div class="nav-item" data-panel="nosotros" onclick="switchPanel(this,'nosotros')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Nosotros
+    </div>
+    <div class="nav-item" data-panel="contacto" onclick="switchPanel(this,'contacto')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9A16 16 0 0 0 15 16.09l1.91-1.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Contacto
+    </div>
+
+    <p class="nav-section-label">Sistema</p>
+    <div class="nav-item" data-panel="config" onclick="switchPanel(this,'config')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Configuración
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nav-item" onclick="logout()" style="color:rgba(224,82,82,0.7)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:1rem">
+      <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-user">Sesión: <span>admin</span></span>
+      <a href="../index.html" target="_blank" class="btn btn-secondary btn-sm">Ver sitio →</a>
+    </div>
+  </header>
+
+  <!-- CONTENT AREA -->
+  <div class="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stats-row" id="dashStats"></div>
+
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;">
+        <div class="box">
+          <p class="box-title">Propiedades recientes</p>
+          <table class="props-table">
+            <thead><tr><th>Imagen</th><th>Ubicación</th><th>Precio</th><th>Tipo</th></tr></thead>
+            <tbody id="dashPropsTable"></tbody>
+          </table>
+        </div>
+        <div class="box">
+          <p class="box-title">Accesos rápidos</p>
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <button class="btn btn-secondary" style="justify-content:flex-start" onclick="switchPanel(document.querySelector('[data-panel=propiedades]'),'propiedades');openPropModal()">
+              + Agregar propiedad
+            </button>
+            <button class="btn btn-secondary" style="justify-content:flex-start" onclick="switchPanel(document.querySelector('[data-panel=nosotros]'),'nosotros');document.getElementById('teamTab').click()">
+              + Agregar miembro del equipo
+            </button>
+            <button class="btn btn-secondary" style="justify-content:flex-start" onclick="switchPanel(document.querySelector('[data-panel=inicio]'),'inicio');document.getElementById('testiTab').click()">
+              + Agregar testimonio
+            </button>
+            <button class="btn btn-secondary" style="justify-content:flex-start" onclick="switchPanel(document.querySelector('[data-panel=contacto]'),'contacto')">
+              Editar información de contacto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INICIO ═══ -->
+    <div class="panel" id="panel-inicio">
+      <div class="section-tabs">
+        <button class="section-tab active" onclick="switchTab(this,'hero')">Hero</button>
+        <button class="section-tab" id="testiTab" onclick="switchTab(this,'testimonios')">Testimonios</button>
+        <button class="section-tab" onclick="switchTab(this,'servicios')">Servicios</button>
+      </div>
+
+      <!-- Hero -->
+      <div class="tab-content active" id="tab-hero">
+        <div class="box">
+          <p class="box-title">Sección Hero</p>
+          <div class="form-row single">
+            <div class="form-group"><label>Tag superior (ej: Inmobiliaria de Lujo)</label><input type="text" id="hero-tag" placeholder="Inmobiliaria de Lujo"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Título parte 1</label><input type="text" id="hero-title1" placeholder="Encuentra el hogar"></div>
+            <div class="form-group"><label>Título parte 2 (cursiva/dorada)</label><input type="text" id="hero-title2" placeholder="de tus sueños"></div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group"><label>Subtítulo</label><input type="text" id="hero-subtitle" placeholder="Compra, vende o renta propiedades..."></div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group"><label>Imagen de fondo (URL)</label><input type="text" id="hero-bg" placeholder="https://..."></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveHero()">Guardar cambios</button>
+        </div>
+      </div>
+
+      <!-- Testimonios -->
+      <div class="tab-content" id="tab-testimonios">
+        <div class="sec-header">
+          <p class="sec-title">Testimonios</p>
+          <button class="btn btn-primary" onclick="openTestimonialModal()">+ Agregar testimonio</button>
+        </div>
+        <div class="testimonial-list" id="testimonialList"></div>
+      </div>
+
+      <!-- Servicios -->
+      <div class="tab-content" id="tab-servicios">
+        <div class="sec-header">
+          <p class="sec-title">Servicios</p>
+          <button class="btn btn-primary" onclick="openServiceModal()">+ Agregar servicio</button>
+        </div>
+        <div id="servicesList"></div>
+      </div>
+    </div>
+
+    <!-- ═══ PROPIEDADES ═══ -->
+    <div class="panel" id="panel-propiedades">
+      <div class="sec-header">
+        <p class="sec-title">Gestión de <span>Propiedades</span></p>
+        <button class="btn btn-primary" onclick="openPropModal()">+ Nueva propiedad</button>
+      </div>
+      <div class="box" style="padding:0;overflow:hidden;">
+        <table class="props-table" id="propertiesTable">
+          <thead><tr><th></th><th>Ubicación</th><th>Tipo</th><th>Operación</th><th>Precio</th><th>m²</th><th>Recámaras</th><th style="text-align:right">Acciones</th></tr></thead>
+          <tbody id="propertiesTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ═══ NOSOTROS ═══ -->
+    <div class="panel" id="panel-nosotros">
+      <div class="section-tabs">
+        <button class="section-tab active" onclick="switchTab(this,'about')">Sobre nosotros</button>
+        <button class="section-tab" id="teamTab" onclick="switchTab(this,'equipo')">Equipo</button>
+        <button class="section-tab" onclick="switchTab(this,'stats')">Estadísticas</button>
+      </div>
+
+      <!-- Sobre nosotros -->
+      <div class="tab-content active" id="tab-about">
+        <div class="box">
+          <p class="box-title">Textos principales</p>
+          <div class="form-row">
+            <div class="form-group"><label>Título parte 1</label><input type="text" id="about-title1" placeholder="Más de 25 años"></div>
+            <div class="form-group"><label>Título parte 2 (cursiva)</label><input type="text" id="about-title2" placeholder="de experiencia"></div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group"><label>Párrafo 1</label><textarea id="about-p1"></textarea></div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group"><label>Párrafo 2</label><textarea id="about-p2"></textarea></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Misión</label><textarea id="about-mision" style="min-height:70px"></textarea></div>
+            <div class="form-group"><label>Visión</label><textarea id="about-vision" style="min-height:70px"></textarea></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveAbout()">Guardar cambios</button>
+        </div>
+        <div class="box">
+          <p class="box-title">Imagen de fondo (Nosotros)</p>
+          <div class="form-row single">
+            <div class="form-group"><label>URL de imagen</label><input type="text" id="about-bg" placeholder="https://..."></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveAbout()">Guardar</button>
+        </div>
+      </div>
+
+      <!-- Equipo -->
+      <div class="tab-content" id="tab-equipo">
+        <div class="sec-header">
+          <p class="sec-title">Equipo</p>
+          <button class="btn btn-primary" onclick="openTeamModal()">+ Agregar miembro</button>
+        </div>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="tab-content" id="tab-stats">
+        <div class="box">
+          <p class="box-title">Estadísticas</p>
+          <div id="statsFields"></div>
+          <button class="btn btn-primary" onclick="saveStats()">Guardar estadísticas</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ CONTACTO ═══ -->
+    <div class="panel" id="panel-contacto">
+      <div class="box">
+        <p class="box-title">Información de contacto</p>
+        <div class="contact-field">
+          <svg class="contact-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.45 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9A16 16 0 0 0 15 16.09l1.91-1.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span class="contact-field-label">Teléfono</span>
+          <input type="text" id="c-tel" placeholder="+52 (55) 8000-4000">
+        </div>
+        <div class="contact-field">
+          <svg class="contact-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span class="contact-field-label">Correo</span>
+          <input type="email" id="c-email" placeholder="contacto@lumiere.mx">
+        </div>
+        <div class="contact-field">
+          <svg class="contact-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span class="contact-field-label">Dirección</span>
+          <input type="text" id="c-dir" placeholder="Av. Presidente Masaryk 111, Polanco, CDMX">
+        </div>
+        <div class="contact-field">
+          <svg class="contact-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="contact-field-label">WhatsApp</span>
+          <input type="text" id="c-wa" placeholder="525580004000">
+        </div>
+        <div class="contact-field">
+          <svg class="contact-field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="7"/><path d="M24 24l-6.5-6.5"/></svg>
+          <span class="contact-field-label">Maps embed</span>
+          <input type="text" id="c-map" placeholder="URL de Google Maps embed">
+        </div>
+        <div style="margin-top:1.2rem;"></div>
+        <button class="btn btn-primary" onclick="saveContact()">Guardar información</button>
+      </div>
+
+      <div class="box">
+        <p class="box-title">Redes sociales</p>
+        <div class="form-row">
+          <div class="form-group"><label>Facebook URL</label><input type="text" id="c-fb" placeholder="https://facebook.com/lumierepropiedades"></div>
+          <div class="form-group"><label>Instagram URL</label><input type="text" id="c-ig" placeholder="https://instagram.com/lumiereprop"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>LinkedIn URL</label><input type="text" id="c-li" placeholder="https://linkedin.com/..."></div>
+          <div class="form-group"><label>Twitter / X URL</label><input type="text" id="c-tw" placeholder="https://x.com/..."></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveContact()">Guardar redes</button>
+      </div>
+    </div>
+
+    <!-- ═══ CONFIGURACIÓN ═══ -->
+    <div class="panel" id="panel-config">
+      <div class="box">
+        <p class="box-title">Cambiar contraseña</p>
+        <div class="form-row">
+          <div class="form-group"><label>Contraseña actual</label><input type="password" id="conf-old" placeholder="••••••••"></div>
+          <div class="form-group"><label>Nueva contraseña</label><input type="password" id="conf-new" placeholder="••••••••"></div>
+        </div>
+        <div class="form-row single">
+          <div class="form-group"><label>Confirmar nueva contraseña</label><input type="password" id="conf-new2" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-primary" onclick="changePassword()">Actualizar contraseña</button>
+      </div>
+
+      <div class="box">
+        <p class="box-title">Datos del administrador</p>
+        <div class="form-row">
+          <div class="form-group"><label>Nombre del sitio</label><input type="text" id="conf-site" placeholder="LUMIÈRE PROPIEDADES"></div>
+          <div class="form-group"><label>Nombre de usuario</label><input type="text" id="conf-user" value="admin" disabled></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveConfig()">Guardar</button>
+      </div>
+
+      <div class="box">
+        <p class="box-title">Exportar / Importar datos</p>
+        <p style="font-size:0.78rem;color:var(--gray-light);margin-bottom:1rem;">Exporta todos los datos del CMS para respaldo o importación en otro servidor.</p>
+        <div style="display:flex;gap:0.8rem;">
+          <button class="btn btn-secondary" onclick="exportData()">⬇ Exportar datos (JSON)</button>
+          <label class="btn btn-secondary" style="cursor:pointer">
+            ⬆ Importar datos
+            <input type="file" accept=".json" style="display:none" onchange="importData(this)">
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- Modal Propiedad -->
+<div class="modal-overlay" id="propModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="propModalTitle">Nueva Propiedad</h2>
+      <button class="modal-close" onclick="closePropModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="prop-id">
+      <div class="form-row">
+        <div class="form-group"><label>Ubicación</label><input type="text" id="prop-ubicacion" placeholder="Polanco, CDMX"></div>
+        <div class="form-group"><label>Tipo</label>
+          <select id="prop-tipo">
+            <option value="casa">Casa</option>
+            <option value="departamento">Departamento</option>
+            <option value="terreno">Terreno</option>
+            <option value="local">Local</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Operación</label>
+          <select id="prop-op"><option value="venta">Venta</option><option value="renta">Renta</option></select>
+        </div>
+        <div class="form-group"><label>Badge (etiqueta)</label><input type="text" id="prop-badge" placeholder="En venta"></div>
+      </div>
+      <div class="form-row triple">
+        <div class="form-group"><label>Precio (número)</label><input type="number" id="prop-pnum" placeholder="18500000"></div>
+        <div class="form-group"><label>Precio (texto)</label><input type="text" id="prop-precio" placeholder="$18,500,000"></div>
+        <div class="form-group"><label>m²</label><input type="number" id="prop-m2" placeholder="350"></div>
+      </div>
+      <div class="form-row triple">
+        <div class="form-group"><label>Recámaras</label><input type="number" id="prop-rec" placeholder="3" min="0"></div>
+        <div class="form-group"><label>Baños</label><input type="number" id="prop-ban" placeholder="2" min="0"></div>
+        <div class="form-group"><label>Estacionamientos</label><input type="number" id="prop-gar" placeholder="2" min="0"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Imagen (URL)</label><input type="text" id="prop-img" placeholder="https://..."></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Descripción</label><textarea id="prop-desc" placeholder="Descripción de la propiedad..."></textarea></div>
+      </div>
+      <div class="form-group">
+        <label>Características (presiona Enter para agregar)</label>
+        <div class="tags-container" id="featTags">
+          <input class="tags-input" id="featInput" type="text" placeholder="Escribe y presiona Enter..." onkeydown="addTag(event)">
+        </div>
+      </div>
+      <div class="form-row single" style="margin-top:0.5rem">
+        <div class="form-group"><label>Query para mapa (ej: Polanco+CDMX)</label><input type="text" id="prop-mq" placeholder="Polanco+CDMX"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closePropModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProp()">Guardar propiedad</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Testimonio -->
+<div class="modal-overlay" id="testiModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="testiModalTitle">Nuevo Testimonio</h2>
+      <button class="modal-close" onclick="closeTestiModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="testi-idx">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" id="testi-name" placeholder="Ana García"></div>
+        <div class="form-group"><label>Cargo / Ciudad</label><input type="text" id="testi-cargo" placeholder="Empresaria · CDMX"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>URL de foto (avatar)</label><input type="text" id="testi-img" placeholder="https://..."></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Testimonio</label><textarea id="testi-text" placeholder="El equipo de Lumière..."></textarea></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Estrellas</label>
+          <select id="testi-stars">
+            <option value="★★★★★">★★★★★ (5)</option>
+            <option value="★★★★☆">★★★★☆ (4)</option>
+            <option value="★★★☆☆">★★★☆☆ (3)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeTestiModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTesti()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Equipo -->
+<div class="modal-overlay" id="teamModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="teamModalTitle">Nuevo miembro</h2>
+      <button class="modal-close" onclick="closeTeamModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="team-idx">
+      <div class="form-row">
+        <div class="form-group"><label>Nombre</label><input type="text" id="team-name" placeholder="Alejandro Villanueva"></div>
+        <div class="form-group"><label>Cargo</label><input type="text" id="team-role" placeholder="Director General"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>URL de foto</label><input type="text" id="team-img" placeholder="https://..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeTeamModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTeam()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Servicio -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="serviceModalTitle">Nuevo servicio</h2>
+      <button class="modal-close" onclick="closeServiceModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="svc-idx">
+      <div class="form-row single">
+        <div class="form-group"><label>Nombre del servicio</label><input type="text" id="svc-name" placeholder="Asesoría Personalizada"></div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group"><label>Descripción</label><textarea id="svc-desc" placeholder="Descripción breve del servicio..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeServiceModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveService()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-header"><h2>Confirmar eliminación</h2><button class="modal-close" onclick="closeConfirm()">✕</button></div>
+    <div class="modal-body"><p style="font-size:0.85rem;color:var(--gray-light)">¿Estás seguro de que deseas eliminar este elemento? Esta acción no se puede deshacer.</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn btn-danger" id="confirmBtn">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// AUTH GUARD
+// ══════════════════════════════════════
+(function checkAuth() {
+  const s = sessionStorage.getItem('lumiere_admin');
+  if (!s) { window.location.href = './index.html'; return; }
+  try {
+    const d = JSON.parse(s);
+    if (d.expires < Date.now()) {
+      sessionStorage.removeItem('lumiere_admin');
+      window.location.href = './index.html';
+    }
+  } catch { window.location.href = './index.html'; }
+})();
+
+function logout() {
+  sessionStorage.removeItem('lumiere_admin');
+  window.location.href = './index.html';
+}
+
+// ══════════════════════════════════════
+// DATA STORE  (localStorage)
+// ══════════════════════════════════════
+const STORAGE_KEY = 'lumiere_cms';
+
+const DEFAULT_DATA = {
+  hero: {
+    tag: 'Inmobiliaria de Lujo',
+    title1: 'Encuentra el hogar',
+    title2: 'de tus sueños',
+    subtitle: 'Compra, vende o renta propiedades con el respaldo de expertos inmobiliarios.',
+    bg: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1920&q=80'
+  },
+  about: {
+    title1: 'Más de 25 años',
+    title2: 'de experiencia',
+    p1: 'En Lumière Propiedades somos una firma inmobiliaria de alto nivel con más de dos décadas acompañando a familias e inversionistas a encontrar propiedades excepcionales.',
+    p2: 'Nos distingue nuestra atención personalizada, nuestra ética profesional y nuestro profundo conocimiento del mercado inmobiliario de lujo en México.',
+    mision: 'Ofrecer un servicio inmobiliario de excelencia que transforme los sueños de nuestros clientes en realidades tangibles.',
+    vision: 'Ser la firma inmobiliaria de referencia en el segmento premium de México para 2030.',
+    bg: 'https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?w=1400&q=80'
+  },
+  contact: {
+    tel: '+52 (55) 8000-4000',
+    email: 'contacto@lumiere.mx',
+    dir: 'Av. Presidente Masaryk 111, Polanco, CDMX',
+    wa: '525580004000',
+    map: '',
+    fb: '',
+    ig: '',
+    li: '',
+    tw: ''
+  },
+  stats: [
+    { num: '+2,400', label: 'Propiedades vendidas' },
+    { num: '98%', label: 'Clientes satisfechos' },
+    { num: '25+', label: 'Años de experiencia' },
+    { num: '12', label: 'Ciudades activas' }
+  ],
+  properties: [
+    { id:1, tipo:'casa', op:'venta', pNum:18500000, precio:'$18,500,000', img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80', ubicacion:'Lomas de Chapultepec, CDMX', rec:5, ban:4, m2:620, gar:3, badge:'En venta', desc:'Residencia de lujo en el corazón de Lomas de Chapultepec. Acabados europeos, jardín privado, cava de vinos y vista panorámica.', feat:['Jardín privado','Alberca','Cava de vinos','Seguridad 24h','Sala de cine','Smart home','Roof garden'], mq:'Lomas+de+Chapultepec+CDMX' },
+    { id:2, tipo:'departamento', op:'renta', pNum:45000, precio:'$45,000/mes', img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', ubicacion:'Polanco, CDMX', rec:3, ban:2, m2:185, gar:2, badge:'En renta', desc:'Departamento de alto standing en Torre Polanco.', feat:['Concierge','Gimnasio','Spa','Rooftop','Bodega'], mq:'Polanco+CDMX' },
+    { id:3, tipo:'casa', op:'venta', pNum:32000000, precio:'$32,000,000', img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80', ubicacion:'San Ángel, CDMX', rec:6, ban:5, m2:890, gar:4, badge:'Exclusiva', desc:'Casa señorial con arquitectura colonial restaurada.', feat:['Patios coloniales','Biblioteca','Estudio privado','Jardines','Alberca climatizada'], mq:'San+Angel+CDMX' },
+    { id:4, tipo:'departamento', op:'venta', pNum:9200000, precio:'$9,200,000', img:'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80', ubicacion:'Santa Fe, CDMX', rec:2, ban:2, m2:115, gar:2, badge:'En venta', desc:'Moderno departamento con vista 270°.', feat:['Terraza privada','Gimnasio','Pet friendly','Cargadores eléctricos'], mq:'Santa+Fe+CDMX' },
+  ],
+  testimonials: [
+    { n:'Alejandra Ruiz', c:'Empresaria · CDMX', t:'El equipo de Lumière nos acompañó en cada paso de la compra. Su profesionalismo y conocimiento del mercado fueron invaluables. Totalmente recomendados.', s:'★★★★★', img:'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&q=80' },
+    { n:'Carlos Mendoza', c:'Director Ejecutivo · Monterrey', t:'Vendimos nuestra propiedad en tiempo récord y al precio esperado. La estrategia de marketing fue impresionante.', s:'★★★★★', img:'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80' },
+    { n:'Isabella Torres', c:'Arquitecta · Guadalajara', t:'Como profesional del diseño, soy muy exigente. Lumière encontró exactamente lo que buscaba.', s:'★★★★★', img:'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80' },
+  ],
+  team: [
+    { name:'Alejandro Villanueva', role:'Director General', img:'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80' },
+    { name:'Camila Restrepo', role:'Directora Comercial', img:'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80' },
+    { name:'Roberto Salinas', role:'Asesor Senior', img:'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&q=80' },
+    { name:'Valentina Cruz', role:'Asesora Premium', img:'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80' },
+  ],
+  services: [
+    { name:'Compra y venta', desc:'Te acompañamos en todo el proceso de compra o venta de tu propiedad.' },
+    { name:'Renta premium', desc:'Servicio especializado para arrendatarios y arrendadores del segmento alto.' },
+    { name:'Asesoría de inversión', desc:'Análisis de mercado y estrategias para maximizar tu inversión inmobiliaria.' },
+    { name:'Valuaciones', desc:'Avalúos profesionales y certificados para cualquier trámite legal o bancario.' },
+  ]
+};
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULT_DATA));
+    return JSON.parse(raw);
+  } catch { return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let CMS = loadData();
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+const PANEL_TITLES = {
+  dashboard: 'Dashboard',
+  inicio: 'Editar Inicio',
+  propiedades: 'Propiedades',
+  nosotros: 'Editar Nosotros',
+  contacto: 'Información de Contacto',
+  config: 'Configuración'
+};
+
+function switchPanel(el, id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.getElementById('topbarTitle').textContent = PANEL_TITLES[id] || id;
+  // Close sidebar on mobile
+  if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+}
+
+function switchTab(el, id) {
+  const parent = el.closest('.panel') || el.closest('.tab-content')?.closest('.panel');
+  el.closest('.section-tabs').querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const panel = el.closest('.panel');
+  panel.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id)?.classList.add('active');
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+let toastTimeout;
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type === 'error' ? 'show error' : 'show';
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.className = '', 3000);
+}
+
+// ══════════════════════════════════════
+// CONFIRM MODAL
+// ══════════════════════════════════════
+let confirmCallback = null;
+function openConfirm(cb) {
+  confirmCallback = cb;
+  document.getElementById('confirmModal').classList.add('open');
+  document.getElementById('confirmBtn').onclick = () => { closeConfirm(); cb(); };
+}
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+  confirmCallback = null;
+}
+
+// ══════════════════════════════════════
+// TAGS INPUT
+// ══════════════════════════════════════
+let currentTags = [];
+function addTag(e) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const inp = document.getElementById('featInput');
+  const val = inp.value.trim();
+  if (!val || currentTags.includes(val)) return;
+  currentTags.push(val);
+  renderTags();
+  inp.value = '';
+}
+function removeTag(tag) {
+  currentTags = currentTags.filter(t => t !== tag);
+  renderTags();
+}
+function renderTags() {
+  const container = document.getElementById('featTags');
+  const inp = document.getElementById('featInput');
+  container.innerHTML = '';
+  currentTags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.innerHTML = `${t}<button type="button" onclick="removeTag('${t.replace(/'/g,"\\'")}')">×</button>`;
+    container.appendChild(span);
+  });
+  container.appendChild(inp);
+}
+function setTags(tags) {
+  currentTags = [...(tags || [])];
+  renderTags();
+}
+
+// ══════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════
+function renderDashboard() {
+  const props = CMS.properties || [];
+  const venta = props.filter(p => p.op === 'venta').length;
+  const renta = props.filter(p => p.op === 'renta').length;
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-box"><p class="stat-num">${props.length}</p><p class="stat-lbl">Total propiedades</p></div>
+    <div class="stat-box"><p class="stat-num">${venta}</p><p class="stat-lbl">En venta</p></div>
+    <div class="stat-box"><p class="stat-num">${renta}</p><p class="stat-lbl">En renta</p></div>
+    <div class="stat-box"><p class="stat-num">${(CMS.testimonials||[]).length}</p><p class="stat-lbl">Testimonios</p></div>
+    <div class="stat-box"><p class="stat-num">${(CMS.team||[]).length}</p><p class="stat-lbl">Equipo</p></div>
+  `;
+  document.getElementById('dashPropsTable').innerHTML = props.slice(0,5).map(p => `
+    <tr>
+      <td><img class="prop-thumb" src="${p.img}" alt=""></td>
+      <td>${p.ubicacion}</td>
+      <td>${p.precio}</td>
+      <td><span class="badge badge-${p.op}">${p.op}</span></td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════
+// HERO
+// ══════════════════════════════════════
+function loadHeroForm() {
+  const h = CMS.hero || {};
+  document.getElementById('hero-tag').value = h.tag || '';
+  document.getElementById('hero-title1').value = h.title1 || '';
+  document.getElementById('hero-title2').value = h.title2 || '';
+  document.getElementById('hero-subtitle').value = h.subtitle || '';
+  document.getElementById('hero-bg').value = h.bg || '';
+}
+function saveHero() {
+  CMS.hero = {
+    tag: document.getElementById('hero-tag').value,
+    title1: document.getElementById('hero-title1').value,
+    title2: document.getElementById('hero-title2').value,
+    subtitle: document.getElementById('hero-subtitle').value,
+    bg: document.getElementById('hero-bg').value,
+  };
+  saveData(CMS);
+  showToast('✓ Hero actualizado correctamente');
+}
+
+// ══════════════════════════════════════
+// PROPERTIES
+// ══════════════════════════════════════
+function renderPropsTable() {
+  const props = CMS.properties || [];
+  if (!props.length) {
+    document.getElementById('propertiesTableBody').innerHTML = '<tr><td colspan="8"><div class="empty-state"><p>Sin propiedades</p><span>Agrega tu primera propiedad</span></div></td></tr>';
+    return;
+  }
+  document.getElementById('propertiesTableBody').innerHTML = props.map((p,i) => `
+    <tr>
+      <td><img class="prop-thumb" src="${p.img}" alt=""></td>
+      <td>${p.ubicacion}</td>
+      <td>${p.tipo}</td>
+      <td><span class="badge badge-${p.op}">${p.op}</span></td>
+      <td>${p.precio}</td>
+      <td>${p.m2} m²</td>
+      <td>${p.rec || '—'}</td>
+      <td>
+        <button class="btn-icon btn-sm" title="Editar" onclick="editProp(${i})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon btn-sm" title="Eliminar" style="color:var(--error)" onclick="deleteProp(${i})">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </td>
+    </tr>`).join('');
+}
+
+function openPropModal(idx) {
+  currentTags = [];
+  if (idx !== undefined) {
+    const p = CMS.properties[idx];
+    document.getElementById('propModalTitle').textContent = 'Editar Propiedad';
+    document.getElementById('prop-id').value = idx;
+    document.getElementById('prop-ubicacion').value = p.ubicacion || '';
+    document.getElementById('prop-tipo').value = p.tipo || 'casa';
+    document.getElementById('prop-op').value = p.op || 'venta';
+    document.getElementById('prop-badge').value = p.badge || '';
+    document.getElementById('prop-pnum').value = p.pNum || '';
+    document.getElementById('prop-precio').value = p.precio || '';
+    document.getElementById('prop-m2').value = p.m2 || '';
+    document.getElementById('prop-rec').value = p.rec || '';
+    document.getElementById('prop-ban').value = p.ban || '';
+    document.getElementById('prop-gar').value = p.gar || '';
+    document.getElementById('prop-img').value = p.img || '';
+    document.getElementById('prop-desc').value = p.desc || '';
+    document.getElementById('prop-mq').value = p.mq || '';
+    setTags(p.feat || []);
+  } else {
+    document.getElementById('propModalTitle').textContent = 'Nueva Propiedad';
+    document.getElementById('prop-id').value = '';
+    ['prop-ubicacion','prop-tipo','prop-op','prop-badge','prop-pnum','prop-precio','prop-m2','prop-rec','prop-ban','prop-gar','prop-img','prop-desc','prop-mq'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.selectedIndex = 0;
+      else el.value = '';
+    });
+    setTags([]);
+  }
+  document.getElementById('propModal').classList.add('open');
+}
+
+function editProp(idx) { openPropModal(idx); }
+
+function closePropModal() { document.getElementById('propModal').classList.remove('open'); }
+
+function saveProp() {
+  const idx = document.getElementById('prop-id').value;
+  const prop = {
+    id: idx !== '' ? CMS.properties[parseInt(idx)].id : Date.now(),
+    ubicacion: document.getElementById('prop-ubicacion').value,
+    tipo: document.getElementById('prop-tipo').value,
+    op: document.getElementById('prop-op').value,
+    badge: document.getElementById('prop-badge').value,
+    pNum: parseFloat(document.getElementById('prop-pnum').value) || 0,
+    precio: document.getElementById('prop-precio').value,
+    m2: parseFloat(document.getElementById('prop-m2').value) || 0,
+    rec: parseInt(document.getElementById('prop-rec').value) || 0,
+    ban: parseInt(document.getElementById('prop-ban').value) || 0,
+    gar: parseInt(document.getElementById('prop-gar').value) || 0,
+    img: document.getElementById('prop-img').value,
+    desc: document.getElementById('prop-desc').value,
+    feat: [...currentTags],
+    mq: document.getElementById('prop-mq').value,
+  };
+  if (!prop.ubicacion) { showToast('La ubicación es requerida', 'error'); return; }
+  if (idx !== '') {
+    CMS.properties[parseInt(idx)] = prop;
+  } else {
+    CMS.properties.push(prop);
+  }
+  saveData(CMS);
+  renderPropsTable();
+  renderDashboard();
+  closePropModal();
+  showToast('✓ Propiedad guardada correctamente');
+}
+
+function deleteProp(idx) {
+  openConfirm(() => {
+    CMS.properties.splice(idx, 1);
+    saveData(CMS);
+    renderPropsTable();
+    renderDashboard();
+    showToast('✓ Propiedad eliminada');
+  });
+}
+
+// ══════════════════════════════════════
+// TESTIMONIALS
+// ══════════════════════════════════════
+function renderTestimonials() {
+  const list = CMS.testimonials || [];
+  if (!list.length) {
+    document.getElementById('testimonialList').innerHTML = '<div class="empty-state"><p>Sin testimonios</p></div>';
+    return;
+  }
+  document.getElementById('testimonialList').innerHTML = list.map((t,i) => `
+    <div class="testimonial-item">
+      <img class="testi-avatar" src="${t.img}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(t.n)}&background=1a1a1a&color=c9a84c'">
+      <div class="testi-body">
+        <p class="testi-name">${t.n}</p>
+        <p class="testi-role">${t.c} · ${t.s}</p>
+        <p class="testi-text">${t.t}</p>
+        <div class="testi-actions">
+          <button class="btn btn-secondary btn-sm" onclick="openTestimonialModal(${i})">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteTesti(${i})">Eliminar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openTestimonialModal(idx) {
+  if (idx !== undefined) {
+    const t = CMS.testimonials[idx];
+    document.getElementById('testiModalTitle').textContent = 'Editar Testimonio';
+    document.getElementById('testi-idx').value = idx;
+    document.getElementById('testi-name').value = t.n;
+    document.getElementById('testi-cargo').value = t.c;
+    document.getElementById('testi-img').value = t.img;
+    document.getElementById('testi-text').value = t.t;
+    document.getElementById('testi-stars').value = t.s;
+  } else {
+    document.getElementById('testiModalTitle').textContent = 'Nuevo Testimonio';
+    document.getElementById('testi-idx').value = '';
+    ['testi-name','testi-cargo','testi-img','testi-text'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('testi-stars').value = '★★★★★';
+  }
+  document.getElementById('testiModal').classList.add('open');
+}
+function closeTestiModal() { document.getElementById('testiModal').classList.remove('open'); }
+
+function saveTesti() {
+  const idx = document.getElementById('testi-idx').value;
+  const testi = {
+    n: document.getElementById('testi-name').value,
+    c: document.getElementById('testi-cargo').value,
+    img: document.getElementById('testi-img').value || `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('testi-name').value)}&background=1a1a1a&color=c9a84c`,
+    t: document.getElementById('testi-text').value,
+    s: document.getElementById('testi-stars').value,
+  };
+  if (!testi.n) { showToast('El nombre es requerido', 'error'); return; }
+  if (idx !== '') { CMS.testimonials[parseInt(idx)] = testi; }
+  else { CMS.testimonials.push(testi); }
+  saveData(CMS);
+  renderTestimonials();
+  closeTestiModal();
+  showToast('✓ Testimonio guardado');
+}
+
+function deleteTesti(idx) {
+  openConfirm(() => {
+    CMS.testimonials.splice(idx, 1);
+    saveData(CMS);
+    renderTestimonials();
+    showToast('✓ Testimonio eliminado');
+  });
+}
+
+// ══════════════════════════════════════
+// SERVICES
+// ══════════════════════════════════════
+function renderServices() {
+  const list = CMS.services || [];
+  document.getElementById('servicesList').innerHTML = list.map((s,i) => `
+    <div class="box" style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.3rem;margin-bottom:0.6rem">
+      <div>
+        <p style="font-weight:500;font-size:0.9rem">${s.name}</p>
+        <p style="font-size:0.78rem;color:var(--gray-light);margin-top:0.25rem">${s.desc}</p>
+      </div>
+      <div style="display:flex;gap:0.4rem;flex-shrink:0;margin-left:1rem">
+        <button class="btn btn-secondary btn-sm" onclick="openServiceModal(${i})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteService(${i})">✕</button>
+      </div>
+    </div>`).join('') || '<div class="empty-state"><p>Sin servicios</p></div>';
+}
+
+function openServiceModal(idx) {
+  if (idx !== undefined) {
+    const s = CMS.services[idx];
+    document.getElementById('serviceModalTitle').textContent = 'Editar servicio';
+    document.getElementById('svc-idx').value = idx;
+    document.getElementById('svc-name').value = s.name;
+    document.getElementById('svc-desc').value = s.desc;
+  } else {
+    document.getElementById('serviceModalTitle').textContent = 'Nuevo servicio';
+    document.getElementById('svc-idx').value = '';
+    document.getElementById('svc-name').value = '';
+    document.getElementById('svc-desc').value = '';
+  }
+  document.getElementById('serviceModal').classList.add('open');
+}
+function closeServiceModal() { document.getElementById('serviceModal').classList.remove('open'); }
+
+function saveService() {
+  const idx = document.getElementById('svc-idx').value;
+  const svc = {
+    name: document.getElementById('svc-name').value,
+    desc: document.getElementById('svc-desc').value,
+  };
+  if (!svc.name) { showToast('El nombre es requerido', 'error'); return; }
+  if (idx !== '') { CMS.services[parseInt(idx)] = svc; }
+  else { CMS.services.push(svc); }
+  saveData(CMS);
+  renderServices();
+  closeServiceModal();
+  showToast('✓ Servicio guardado');
+}
+
+function deleteService(idx) {
+  openConfirm(() => {
+    CMS.services.splice(idx, 1);
+    saveData(CMS);
+    renderServices();
+    showToast('✓ Servicio eliminado');
+  });
+}
+
+// ══════════════════════════════════════
+// ABOUT
+// ══════════════════════════════════════
+function loadAboutForm() {
+  const a = CMS.about || {};
+  document.getElementById('about-title1').value = a.title1 || '';
+  document.getElementById('about-title2').value = a.title2 || '';
+  document.getElementById('about-p1').value = a.p1 || '';
+  document.getElementById('about-p2').value = a.p2 || '';
+  document.getElementById('about-mision').value = a.mision || '';
+  document.getElementById('about-vision').value = a.vision || '';
+  document.getElementById('about-bg').value = a.bg || '';
+}
+function saveAbout() {
+  CMS.about = {
+    title1: document.getElementById('about-title1').value,
+    title2: document.getElementById('about-title2').value,
+    p1: document.getElementById('about-p1').value,
+    p2: document.getElementById('about-p2').value,
+    mision: document.getElementById('about-mision').value,
+    vision: document.getElementById('about-vision').value,
+    bg: document.getElementById('about-bg').value,
+  };
+  saveData(CMS);
+  showToast('✓ Información guardada correctamente');
+}
+
+// ══════════════════════════════════════
+// TEAM
+// ══════════════════════════════════════
+function renderTeam() {
+  const team = CMS.team || [];
+  document.getElementById('teamGrid').innerHTML = team.map((m,i) => `
+    <div class="team-item">
+      <img src="${m.img}" alt="" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=242424&color=c9a84c&size=200'">
+      <p class="team-item-name">${m.name}</p>
+      <p class="team-item-role">${m.role}</p>
+      <div class="team-item-actions">
+        <button class="btn btn-secondary btn-sm" onclick="openTeamModal(${i})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTeam(${i})">✕</button>
+      </div>
+    </div>`).join('') || '<div class="empty-state"><p>Sin miembros</p></div>';
+}
+
+function openTeamModal(idx) {
+  if (idx !== undefined) {
+    const m = CMS.team[idx];
+    document.getElementById('teamModalTitle').textContent = 'Editar miembro';
+    document.getElementById('team-idx').value = idx;
+    document.getElementById('team-name').value = m.name;
+    document.getElementById('team-role').value = m.role;
+    document.getElementById('team-img').value = m.img;
+  } else {
+    document.getElementById('teamModalTitle').textContent = 'Nuevo miembro';
+    document.getElementById('team-idx').value = '';
+    document.getElementById('team-name').value = '';
+    document.getElementById('team-role').value = '';
+    document.getElementById('team-img').value = '';
+  }
+  document.getElementById('teamModal').classList.add('open');
+}
+function closeTeamModal() { document.getElementById('teamModal').classList.remove('open'); }
+
+function saveTeam() {
+  const idx = document.getElementById('team-idx').value;
+  const member = {
+    name: document.getElementById('team-name').value,
+    role: document.getElementById('team-role').value,
+    img: document.getElementById('team-img').value || `https://ui-avatars.com/api/?name=${encodeURIComponent(document.getElementById('team-name').value)}&background=242424&color=c9a84c&size=200`,
+  };
+  if (!member.name) { showToast('El nombre es requerido', 'error'); return; }
+  if (idx !== '') { CMS.team[parseInt(idx)] = member; }
+  else { CMS.team.push(member); }
+  saveData(CMS);
+  renderTeam();
+  closeTeamModal();
+  showToast('✓ Miembro guardado');
+}
+
+function deleteTeam(idx) {
+  openConfirm(() => {
+    CMS.team.splice(idx, 1);
+    saveData(CMS);
+    renderTeam();
+    showToast('✓ Miembro eliminado');
+  });
+}
+
+// ══════════════════════════════════════
+// STATS
+// ══════════════════════════════════════
+function renderStatsFields() {
+  const stats = CMS.stats || [];
+  document.getElementById('statsFields').innerHTML = stats.map((s,i) => `
+    <div class="form-row" style="align-items:center">
+      <div class="form-group"><label>Número / Valor</label><input type="text" data-stat-num="${i}" value="${s.num}" placeholder="+2,400"></div>
+      <div class="form-group"><label>Etiqueta</label><input type="text" data-stat-lbl="${i}" value="${s.label}" placeholder="Propiedades vendidas"></div>
+    </div>`).join('');
+}
+function saveStats() {
+  const stats = CMS.stats.map((_, i) => ({
+    num: document.querySelector(`[data-stat-num="${i}"]`).value,
+    label: document.querySelector(`[data-stat-lbl="${i}"]`).value,
+  }));
+  CMS.stats = stats;
+  saveData(CMS);
+  showToast('✓ Estadísticas guardadas');
+}
+
+// ══════════════════════════════════════
+// CONTACT
+// ══════════════════════════════════════
+function loadContactForm() {
+  const c = CMS.contact || {};
+  document.getElementById('c-tel').value = c.tel || '';
+  document.getElementById('c-email').value = c.email || '';
+  document.getElementById('c-dir').value = c.dir || '';
+  document.getElementById('c-wa').value = c.wa || '';
+  document.getElementById('c-map').value = c.map || '';
+  document.getElementById('c-fb').value = c.fb || '';
+  document.getElementById('c-ig').value = c.ig || '';
+  document.getElementById('c-li').value = c.li || '';
+  document.getElementById('c-tw').value = c.tw || '';
+}
+function saveContact() {
+  CMS.contact = {
+    tel: document.getElementById('c-tel').value,
+    email: document.getElementById('c-email').value,
+    dir: document.getElementById('c-dir').value,
+    wa: document.getElementById('c-wa').value,
+    map: document.getElementById('c-map').value,
+    fb: document.getElementById('c-fb').value,
+    ig: document.getElementById('c-ig').value,
+    li: document.getElementById('c-li').value,
+    tw: document.getElementById('c-tw').value,
+  };
+  saveData(CMS);
+  showToast('✓ Información de contacto guardada');
+}
+
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function changePassword() {
+  const oldPass = document.getElementById('conf-old').value;
+  const newPass = document.getElementById('conf-new').value;
+  const newPass2 = document.getElementById('conf-new2').value;
+  if (!oldPass || !newPass) { showToast('Completa todos los campos', 'error'); return; }
+  if (newPass !== newPass2) { showToast('Las contraseñas no coinciden', 'error'); return; }
+  if (newPass.length < 6) { showToast('La contraseña debe tener al menos 6 caracteres', 'error'); return; }
+
+  const currentHash = await sha256(oldPass);
+  const stored = JSON.parse(localStorage.getItem('lumiere_admin_pwd') || '{}');
+  const storedHash = stored.hash || 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
+
+  if (currentHash !== storedHash) { showToast('Contraseña actual incorrecta', 'error'); return; }
+
+  const newHash = await sha256(newPass);
+  localStorage.setItem('lumiere_admin_pwd', JSON.stringify({ hash: newHash }));
+  document.getElementById('conf-old').value = '';
+  document.getElementById('conf-new').value = '';
+  document.getElementById('conf-new2').value = '';
+  showToast('✓ Contraseña actualizada');
+}
+
+function saveConfig() {
+  showToast('✓ Configuración guardada');
+}
+
+// ══════════════════════════════════════
+// EXPORT / IMPORT
+// ══════════════════════════════════════
+function exportData() {
+  const data = JSON.stringify(CMS, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lumiere-cms-backup.json';
+  a.click();
+  showToast('✓ Datos exportados correctamente');
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      CMS = data;
+      saveData(CMS);
+      initAll();
+      showToast('✓ Datos importados correctamente');
+    } catch {
+      showToast('Error al importar: archivo inválido', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+function initAll() {
+  renderDashboard();
+  loadHeroForm();
+  renderTestimonials();
+  renderServices();
+  loadAboutForm();
+  renderTeam();
+  renderStatsFields();
+  renderPropsTable();
+  loadContactForm();
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => {
+    if (e.target === m) {
+      m.classList.remove('open');
+    }
+  });
+});
+
+initAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+Options -Indexes
+
+# Rewrite rules for clean /admin URL
+RewriteEngine On
+
+# /admin → admin/index.html (login)
+RewriteRule ^admin/?$ admin/index.html [L]
+
+# /admin/dashboard → admin/dashboard.html
+RewriteRule ^admin/dashboard/?$ admin/dashboard.html [L]
+
+# Protect admin folder from directory listing
+<Directory "admin">
+  Options -Indexes
+</Directory>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+</IfModule>
