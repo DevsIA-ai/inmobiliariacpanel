@@ -257,8 +257,6 @@ async function sha256(message) {
 
 // Chequear si ya está logueado
 (function checkAuth() {
-  // En file:// la sesión no funciona entre páginas — solo redirigir en servidor real
-  if (location.protocol === 'file:') return;
   const session = getSession();
   if (session) {
     window.location.href = './dashboard.html';
@@ -303,18 +301,13 @@ async function handleLogin() {
   try {
     const passHash = await sha256(pass);
     if (user === ADMIN_USER && passHash === ADMIN_PASS_HASH) {
+      // Crear sesión por 8 horas
       const session = {
         user: ADMIN_USER,
         expires: Date.now() + (8 * 60 * 60 * 1000),
         token: crypto.randomUUID()
       };
-      const sessionStr = JSON.stringify(session);
-      // En file:// usar localStorage porque sessionStorage no se comparte entre archivos
-      if (location.protocol === 'file:') {
-        localStorage.setItem('lumiere_admin', sessionStr);
-      } else {
-        sessionStorage.setItem('lumiere_admin', sessionStr);
-      }
+      sessionStorage.setItem('lumiere_admin', JSON.stringify(session));
       window.location.href = './dashboard.html';
     } else {
       showError('Usuario o contraseña incorrectos.');
