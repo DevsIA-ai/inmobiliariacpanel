@@ -228,13 +228,6 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
 .img-upload-label span { color: var(--gold); }
 .img-preview { max-width: 100%; max-height: 180px; object-fit: contain; display: none; margin: 0 auto; }
 
-/* ── IMAGE UPLOAD COMBO ── */
-.img-field-wrap { display: flex; gap: 0.5rem; align-items: center; }
-.img-field-wrap input[type="text"] { flex: 1; }
-.btn-upload-img { flex-shrink: 0; padding: 0.52rem 0.9rem; background: var(--dark-3); border: 1px solid rgba(255,255,255,0.1); color: var(--gold); font-family: var(--font-body); font-size: 0.68rem; letter-spacing: 0.1em; cursor: pointer; white-space: nowrap; transition: border-color 0.2s; }
-.btn-upload-img:hover { border-color: var(--gold); }
-.img-field-hidden { display: none; }
-
 /* ── CONTACT FORM FIELDS ── */
 .contact-field { display: flex; align-items: center; gap: 1rem; padding: 0.9rem 0; border-bottom: 1px solid var(--dark-3); }
 .contact-field-icon { color: var(--gold); flex-shrink: 0; }
@@ -485,7 +478,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
             <div class="form-group"><label>Subtítulo</label><input type="text" id="hero-subtitle" placeholder="Compra, vende o renta propiedades..."></div>
           </div>
           <div class="form-row single">
-            <div class="form-group"><label>Imagen de fondo</label><div class="img-field-wrap"><input type="text" id="hero-bg" placeholder="https://... o sube una imagen"><button class="btn-upload-img" onclick="triggerImgUpload('hero-bg')">📁 Subir imagen</button><input class="img-field-hidden" type="file" id="hero-bg-file" accept="image/*" onchange="loadImgFile(this,'hero-bg')"></div></div>
+            <div class="form-group"><label>Imagen de fondo (URL)</label><input type="text" id="hero-bg" placeholder="https://..."></div>
           </div>
           <button class="btn btn-primary" onclick="saveHero()">Guardar cambios</button>
         </div>
@@ -555,7 +548,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="box">
           <p class="box-title">Imagen de fondo (Nosotros)</p>
           <div class="form-row single">
-            <div class="form-group"><label>Imagen de fondo</label><div class="img-field-wrap"><input type="text" id="about-bg" placeholder="https://... o sube una imagen"><button class="btn-upload-img" onclick="triggerImgUpload('about-bg')">📁 Subir imagen</button><input class="img-field-hidden" type="file" id="about-bg-file" accept="image/*" onchange="loadImgFile(this,'about-bg')"></div></div>
+            <div class="form-group"><label>URL de imagen</label><input type="text" id="about-bg" placeholder="https://..."></div>
           </div>
           <button class="btn btn-primary" onclick="saveAbout()">Guardar</button>
         </div>
@@ -708,7 +701,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Estacionamientos</label><input type="number" id="prop-gar" placeholder="2" min="0"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Imagen</label><div class="img-field-wrap"><input type="text" id="prop-img" placeholder="https://... o sube una imagen"><button class="btn-upload-img" onclick="triggerImgUpload('prop-img')">📁 Subir imagen</button><input class="img-field-hidden" type="file" id="prop-img-file" accept="image/*" onchange="loadImgFile(this,'prop-img')"></div></div>
+        <div class="form-group"><label>Imagen (URL)</label><input type="text" id="prop-img" placeholder="https://..."></div>
       </div>
       <div class="form-row single">
         <div class="form-group"><label>Descripción</label><textarea id="prop-desc" placeholder="Descripción de la propiedad..."></textarea></div>
@@ -744,7 +737,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Cargo / Ciudad</label><input type="text" id="testi-cargo" placeholder="Empresaria · CDMX"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Foto (avatar)</label><div class="img-field-wrap"><input type="text" id="testi-img" placeholder="https://... o sube una imagen"><button class="btn-upload-img" onclick="triggerImgUpload('testi-img')">📁 Subir imagen</button><input class="img-field-hidden" type="file" id="testi-img-file" accept="image/*" onchange="loadImgFile(this,'testi-img')"></div></div>
+        <div class="form-group"><label>URL de foto (avatar)</label><input type="text" id="testi-img" placeholder="https://..."></div>
       </div>
       <div class="form-row single">
         <div class="form-group"><label>Testimonio</label><textarea id="testi-text" placeholder="El equipo de Lumière..."></textarea></div>
@@ -780,7 +773,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Cargo</label><input type="text" id="team-role" placeholder="Director General"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Foto</label><div class="img-field-wrap"><input type="text" id="team-img" placeholder="https://... o sube una imagen"><button class="btn-upload-img" onclick="triggerImgUpload('team-img')">📁 Subir imagen</button><input class="img-field-hidden" type="file" id="team-img-file" accept="image/*" onchange="loadImgFile(this,'team-img')"></div></div>
+        <div class="form-group"><label>URL de foto</label><input type="text" id="team-img" placeholder="https://..."></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -830,14 +823,12 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
 // AUTH GUARD
 // ══════════════════════════════════════
 (function checkAuth() {
-  if (location.protocol === 'file:') return;
-  const store = location.protocol === 'file:' ? localStorage : sessionStorage;
-  const s = store.getItem('lumiere_admin');
+  const s = sessionStorage.getItem('lumiere_admin');
   if (!s) { window.location.href = './index.html'; return; }
   try {
     const d = JSON.parse(s);
     if (d.expires < Date.now()) {
-      store.removeItem('lumiere_admin');
+      sessionStorage.removeItem('lumiere_admin');
       window.location.href = './index.html';
     }
   } catch { window.location.href = './index.html'; }
@@ -845,7 +836,6 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
 
 function logout() {
   sessionStorage.removeItem('lumiere_admin');
-  localStorage.removeItem('lumiere_admin');
   window.location.href = './index.html';
 }
 
@@ -1534,26 +1524,7 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
   });
 });
 
-// ══════════════════════════════════════
-// IMAGE UPLOAD — convierte imagen local a base64
-// ══════════════════════════════════════
-function triggerImgUpload(inputId) {
-  document.getElementById(inputId + '-file').click();
-}
-
-function loadImgFile(fileInput, targetInputId) {
-  const file = fileInput.files[0];
-  if (!file) return;
-  if (file.size > 1.5 * 1024 * 1024) {
-    showToast('⚠️ Imagen muy grande (+1.5MB). Usa una más pequeña o comprimida.', 'error');
-  }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById(targetInputId).value = e.target.result;
-    showToast('✓ Imagen cargada — presiona Guardar para aplicar');
-  };
-  reader.readAsDataURL(file);
-  fileInput.value = '';
-}
-
 initAll();
+</script>
+</body>
+</html>
