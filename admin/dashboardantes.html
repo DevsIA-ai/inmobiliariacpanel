@@ -355,28 +355,6 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
 .divider-gold { height: 1px; background: linear-gradient(90deg, var(--gold), transparent); opacity: 0.3; margin: 1.5rem 0; }
 
 .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 0.3rem; }
-
-/* ── IMAGE UPLOADER ── */
-.img-upload-wrap { display: flex; flex-direction: column; gap: 0.5rem; }
-.img-preview-box {
-  width: 100%; height: 140px; background: var(--dark-3);
-  border: 1px dashed rgba(201,168,76,0.3);
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden; position: relative; cursor: pointer;
-  transition: border-color 0.2s;
-}
-.img-preview-box:hover { border-color: var(--gold); }
-.img-preview-box img { width: 100%; height: 100%; object-fit: cover; display: none; }
-.img-preview-box img.has-img { display: block; }
-.img-placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; color: var(--gray); pointer-events: none; }
-.img-placeholder svg { stroke: var(--gold); opacity: 0.6; }
-.img-placeholder span { font-size: 0.68rem; letter-spacing: 0.1em; }
-.img-placeholder.hidden { display: none; }
-.img-upload-row { display: flex; gap: 0.5rem; align-items: center; }
-.img-upload-row input[type="text"] { flex: 1; }
-.btn-upload-file { background: var(--dark-3); border: 1px solid rgba(255,255,255,0.1); color: var(--gold); font-family: var(--font-body); font-size: 0.65rem; letter-spacing: 0.1em; padding: 0.5rem 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-.btn-upload-file:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
-.img-upload-hint { font-size: 0.6rem; color: var(--gray); letter-spacing: 0.08em; }
 </style>
 </head>
 <body>
@@ -500,7 +478,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
             <div class="form-group"><label>Subtítulo</label><input type="text" id="hero-subtitle" placeholder="Compra, vende o renta propiedades..."></div>
           </div>
           <div class="form-row single">
-            <div class="form-group"><label>Imagen de fondo</label><div class="img-upload-wrap"><div class="img-preview-box" onclick="document.getElementById('hero-bg-file').click()"><img id="hero-bg-preview" alt=""><div class="img-placeholder" id="hero-bg-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Clic para subir imagen</span></div></div><div class="img-upload-row"><input type="text" id="hero-bg" placeholder="https://... (o sube una imagen)"><button class="btn-upload-file" type="button" onclick="document.getElementById('hero-bg-file').click()">📁 Subir</button></div><input type="file" id="hero-bg-file" accept="image/*" style="display:none" onchange="handleImgUpload(this,'hero-bg','hero-bg-preview','hero-bg-placeholder')"><span class="img-upload-hint">JPG, PNG, WEBP — recomendado 1920×1080px</span></div></div>
+            <div class="form-group"><label>Imagen de fondo (URL)</label><input type="text" id="hero-bg" placeholder="https://..."></div>
           </div>
           <button class="btn btn-primary" onclick="saveHero()">Guardar cambios</button>
         </div>
@@ -570,7 +548,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="box">
           <p class="box-title">Imagen de fondo (Nosotros)</p>
           <div class="form-row single">
-            <div class="form-group"><label>Imagen de fondo</label><div class="img-upload-wrap"><div class="img-preview-box" onclick="document.getElementById('about-bg-file').click()"><img id="about-bg-preview" alt=""><div class="img-placeholder" id="about-bg-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Clic para subir imagen</span></div></div><div class="img-upload-row"><input type="text" id="about-bg" placeholder="https://... (o sube una imagen)"><button class="btn-upload-file" type="button" onclick="document.getElementById('about-bg-file').click()">📁 Subir</button></div><input type="file" id="about-bg-file" accept="image/*" style="display:none" onchange="handleImgUpload(this,'about-bg','about-bg-preview','about-bg-placeholder')"><span class="img-upload-hint">JPG, PNG, WEBP — recomendado 1400×900px</span></div></div>
+            <div class="form-group"><label>URL de imagen</label><input type="text" id="about-bg" placeholder="https://..."></div>
           </div>
           <button class="btn btn-primary" onclick="saveAbout()">Guardar</button>
         </div>
@@ -723,7 +701,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Estacionamientos</label><input type="number" id="prop-gar" placeholder="2" min="0"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Imagen de la propiedad</label><div class="img-upload-wrap"><div class="img-preview-box" onclick="document.getElementById('prop-img-file').click()"><img id="prop-img-preview" alt=""><div class="img-placeholder" id="prop-img-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><span>Clic para subir imagen</span></div></div><div class="img-upload-row"><input type="text" id="prop-img" placeholder="https://... (o sube una imagen)"><button class="btn-upload-file" type="button" onclick="document.getElementById('prop-img-file').click()">📁 Subir</button></div><input type="file" id="prop-img-file" accept="image/*" style="display:none" onchange="handleImgUpload(this,'prop-img','prop-img-preview','prop-img-placeholder')"><span class="img-upload-hint">JPG, PNG, WEBP — recomendado 800×600px</span></div></div>
+        <div class="form-group"><label>Imagen (URL)</label><input type="text" id="prop-img" placeholder="https://..."></div>
       </div>
       <div class="form-row single">
         <div class="form-group"><label>Descripción</label><textarea id="prop-desc" placeholder="Descripción de la propiedad..."></textarea></div>
@@ -759,7 +737,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Cargo / Ciudad</label><input type="text" id="testi-cargo" placeholder="Empresaria · CDMX"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Foto (avatar)</label><div class="img-upload-wrap"><div class="img-preview-box" style="height:100px" onclick="document.getElementById('testi-img-file').click()"><img id="testi-img-preview" alt=""><div class="img-placeholder" id="testi-img-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Clic para subir foto</span></div></div><div class="img-upload-row"><input type="text" id="testi-img" placeholder="https://... (o sube una imagen)"><button class="btn-upload-file" type="button" onclick="document.getElementById('testi-img-file').click()">📁 Subir</button></div><input type="file" id="testi-img-file" accept="image/*" style="display:none" onchange="handleImgUpload(this,'testi-img','testi-img-preview','testi-img-placeholder')"><span class="img-upload-hint">JPG, PNG — recomendado cuadrada 200×200px</span></div></div>
+        <div class="form-group"><label>URL de foto (avatar)</label><input type="text" id="testi-img" placeholder="https://..."></div>
       </div>
       <div class="form-row single">
         <div class="form-group"><label>Testimonio</label><textarea id="testi-text" placeholder="El equipo de Lumière..."></textarea></div>
@@ -795,7 +773,7 @@ body { font-family: var(--font-body); background: #0d0d0d; color: var(--white); 
         <div class="form-group"><label>Cargo</label><input type="text" id="team-role" placeholder="Director General"></div>
       </div>
       <div class="form-row single">
-        <div class="form-group"><label>Foto del miembro</label><div class="img-upload-wrap"><div class="img-preview-box" style="height:120px" onclick="document.getElementById('team-img-file').click()"><img id="team-img-preview" alt=""><div class="img-placeholder" id="team-img-placeholder"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Clic para subir foto</span></div></div><div class="img-upload-row"><input type="text" id="team-img" placeholder="https://... (o sube una imagen)"><button class="btn-upload-file" type="button" onclick="document.getElementById('team-img-file').click()">📁 Subir</button></div><input type="file" id="team-img-file" accept="image/*" style="display:none" onchange="handleImgUpload(this,'team-img','team-img-preview','team-img-placeholder')"><span class="img-upload-hint">JPG, PNG — recomendado cuadrada 400×400px</span></div></div>
+        <div class="form-group"><label>URL de foto</label><input type="text" id="team-img" placeholder="https://..."></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1064,7 +1042,6 @@ function loadHeroForm() {
   document.getElementById('hero-title2').value = h.title2 || '';
   document.getElementById('hero-subtitle').value = h.subtitle || '';
   document.getElementById('hero-bg').value = h.bg || '';
-  initImgPreview('hero-bg-preview','hero-bg-placeholder','hero-bg');
 }
 function saveHero() {
   CMS.hero = {
@@ -1124,7 +1101,6 @@ function openPropModal(idx) {
     document.getElementById('prop-ban').value = p.ban || '';
     document.getElementById('prop-gar').value = p.gar || '';
     document.getElementById('prop-img').value = p.img || '';
-    initImgPreview('prop-img-preview','prop-img-placeholder','prop-img');
     document.getElementById('prop-desc').value = p.desc || '';
     document.getElementById('prop-mq').value = p.mq || '';
     setTags(p.feat || []);
@@ -1219,14 +1195,12 @@ function openTestimonialModal(idx) {
     document.getElementById('testi-name').value = t.n;
     document.getElementById('testi-cargo').value = t.c;
     document.getElementById('testi-img').value = t.img;
-    initImgPreview('testi-img-preview','testi-img-placeholder','testi-img');
     document.getElementById('testi-text').value = t.t;
     document.getElementById('testi-stars').value = t.s;
   } else {
     document.getElementById('testiModalTitle').textContent = 'Nuevo Testimonio';
     document.getElementById('testi-idx').value = '';
     ['testi-name','testi-cargo','testi-img','testi-text'].forEach(id => document.getElementById(id).value = '');
-    initImgPreview('testi-img-preview','testi-img-placeholder','testi-img');
     document.getElementById('testi-stars').value = '★★★★★';
   }
   document.getElementById('testiModal').classList.add('open');
@@ -1331,7 +1305,6 @@ function loadAboutForm() {
   document.getElementById('about-mision').value = a.mision || '';
   document.getElementById('about-vision').value = a.vision || '';
   document.getElementById('about-bg').value = a.bg || '';
-  initImgPreview('about-bg-preview','about-bg-placeholder','about-bg');
 }
 function saveAbout() {
   CMS.about = {
@@ -1372,14 +1345,12 @@ function openTeamModal(idx) {
     document.getElementById('team-name').value = m.name;
     document.getElementById('team-role').value = m.role;
     document.getElementById('team-img').value = m.img;
-    initImgPreview('team-img-preview','team-img-placeholder','team-img');
   } else {
     document.getElementById('teamModalTitle').textContent = 'Nuevo miembro';
     document.getElementById('team-idx').value = '';
     document.getElementById('team-name').value = '';
     document.getElementById('team-role').value = '';
     document.getElementById('team-img').value = '';
-    initImgPreview('team-img-preview','team-img-placeholder','team-img');
   }
   document.getElementById('teamModal').classList.add('open');
 }
@@ -1554,48 +1525,6 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 });
 
 initAll();
-
-// ══════════════════════════════════════
-// IMAGE UPLOAD (base64)
-// ══════════════════════════════════════
-function handleImgUpload(input, textId, previewId, placeholderId) {
-  const file = input.files[0];
-  if (!file) return;
-  const maxMB = 2;
-  if (file.size > maxMB * 1024 * 1024) {
-    showToast(`La imagen debe pesar menos de ${maxMB}MB`, 'error');
-    input.value = '';
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64 = e.target.result;
-    document.getElementById(textId).value = base64;
-    setImgPreview(previewId, placeholderId, base64);
-  };
-  reader.readAsDataURL(file);
-}
-
-function setImgPreview(previewId, placeholderId, src) {
-  const img = document.getElementById(previewId);
-  const placeholder = document.getElementById(placeholderId);
-  if (!img || !src) return;
-  img.src = src;
-  img.classList.add('has-img');
-  if (placeholder) placeholder.classList.add('hidden');
-  img.onerror = () => { img.classList.remove('has-img'); if (placeholder) placeholder.classList.remove('hidden'); };
-}
-
-function initImgPreview(previewId, placeholderId, textId) {
-  const val = document.getElementById(textId)?.value;
-  if (val) setImgPreview(previewId, placeholderId, val);
-  else {
-    const img = document.getElementById(previewId);
-    if (img) { img.classList.remove('has-img'); img.src = ''; }
-    const ph = document.getElementById(placeholderId);
-    if (ph) ph.classList.remove('hidden');
-  }
-}
 </script>
 </body>
 </html>
