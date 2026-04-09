@@ -524,6 +524,21 @@ nav {
 // CMS DATA LOADER — carga desde localStorage si existe
 // ══════════════════════════════════════════════════════
 const CMS_KEY = 'lumiere_cms';
+
+// Detectar si se está abriendo como archivo local (file://)
+// En ese caso localStorage puede no funcionar correctamente entre páginas
+(function checkLocalFileWarning() {
+  if (location.protocol === 'file:') {
+    console.warn(
+      '%c⚠️ LUMIÈRE CMS: Abriendo como archivo local (file://)\n' +
+      'Los cambios del dashboard NO se verán aquí porque cada archivo tiene su propio localStorage.\n' +
+      'Solución: usa un servidor local. Ejemplo con Python:\n' +
+      '  cd tu-carpeta && python3 -m http.server 8000\n' +
+      'Luego abre: http://localhost:8000',
+      'background:#1a1a1a;color:#C9A84C;padding:8px;font-size:13px;'
+    );
+  }
+})();
 const DEFAULT_PROPS = [
   { id:1, tipo:'casa', op:'venta', pNum:18500000, precio:'$18,500,000', img:'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80', ubicacion:'Lomas de Chapultepec, CDMX', rec:5, ban:4, m2:620, gar:3, badge:'En venta', desc:'Residencia de lujo en el corazón de Lomas de Chapultepec. Acabados europeos, jardín privado, cava de vinos y vista panorámica.', feat:['Jardín privado','Alberca','Cava de vinos','Seguridad 24h','Sala de cine','Smart home','Roof garden'], mq:'Lomas+de+Chapultepec+CDMX' },
   { id:2, tipo:'departamento', op:'renta', pNum:45000, precio:'$45,000/mes', img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', ubicacion:'Polanco, CDMX', rec:3, ban:2, m2:185, gar:2, badge:'En renta', desc:'Departamento de alto standing en Torre Polanco con vistas al parque. Cocina integral equipada y acceso a amenidades de lujo.', feat:['Concierge','Gimnasio','Spa','Rooftop','Bodega'], mq:'Polanco+CDMX' },
@@ -659,10 +674,6 @@ function applyCMS() {
 
 // URL routing: /admin → admin login (handled by server or .htaccess)
 // For local file usage, nothing to do here
-
-
-let currentProp = null;
-let opFilter = '';
 
 // TAB SWITCHING
 function switchTab(tab) {
@@ -802,6 +813,9 @@ function handleSubmit(e) {
 }
 
 // INIT
+let currentProp = null;
+let opFilter = '';
+
 document.getElementById('testimonialsTrack').innerHTML = TESTIMONIALS.map(t => `
   <div class="testimonial-card">
     <p class="quote-mark">"</p>
@@ -818,9 +832,6 @@ document.getElementById('testimonialsTrack').innerHTML = TESTIMONIALS.map(t => `
 
 renderProps(PROPS);
 applyCMS();
-
-let currentProp = null;
-let opFilter = '';
 </script>
 </body>
 </html>
